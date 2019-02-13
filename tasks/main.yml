@@ -36,3 +36,25 @@
   tags:
     - configuration
     - packages
+
+# Su busca el nombre del hostname que se esta actualizando actualmente... shell hostname o inventory_host de proxmox 
+- name: Hostname
+  shell: hostname
+  changed_when: False
+  register: hostnames
+
+# verifica que existe un nuevo kernel para actualizar
+- name: chequear si existe kernel nuevo
+  shell:  apt-cache madison linux-image* linux-headers* linux-modules* | head -n 1 | awk -F"|" '{printf("%s\n", $2)}'
+  changed_when: False
+  register: uname_result
+
+# envia mensaje a chat si existe una version de kernel nueva
+- name: enviar mensaje al chat debian_upgrade_bot
+  telegram:
+    token: "{{ token }}"
+    chat_id: "{{ chat_id }}"
+  #  msg: El servidor {{ hostnames.stdout }} fue actualizado de Debian {{ release.stdout }} a {{ new_release.stdout }}
+    msg: Existe una nueva version de kernel para {{ hostnames.stdout }} 
+  #when: release.stdout != new_release.stdout
+  when: uname_result.stdout_lines != []

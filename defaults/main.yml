@@ -1,6 +1,9 @@
 ---
 # defaults file for sbaerlocher.update-management
 
+token: 77777777
+chat_id: 000000
+
 ## CentOS
 
 update_management_CentOS_enable: true
